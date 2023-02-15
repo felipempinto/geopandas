@@ -8,6 +8,8 @@ import shapely.wkb
 
 from geopandas import GeoDataFrame
 
+from sqlalchemy import text
+
 from .. import _compat as compat
 
 
@@ -426,9 +428,10 @@ def _write_postgis(
             # Only check SRID if table exists
             if connection.dialect.has_table(connection, name, schema):
                 target_srid = connection.execute(
+                    text(
                     "SELECT Find_SRID('{schema}', '{table}', '{geom_col}');".format(
                         schema=schema_name, table=name, geom_col=geom_name
-                    )
+                    ))
                 ).fetchone()[0]
 
                 if target_srid != srid:
